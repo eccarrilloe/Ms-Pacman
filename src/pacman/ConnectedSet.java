@@ -56,7 +56,8 @@ public class ConnectedSet implements Drawable {
         return c == MsPacInterface.blinky ||
                 c == MsPacInterface.pinky ||
                 c == MsPacInterface.inky ||
-                c == MsPacInterface.sue;
+                c == MsPacInterface.sue ||
+                 c == MsPacInterface.victims;
     }
 
     public boolean isPacMan() {
