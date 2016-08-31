@@ -67,8 +67,8 @@ public class MsPacInterface {
         if (display) sd.updateObjects(al);
     }
 
-    static int left = 530;
-    static int top = 274;
+    static int left = 573;
+    static int top = 254;
     public static int width = 223;
     public static int height = 275;
     int[] pixels;
