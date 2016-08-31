@@ -26,7 +26,14 @@ Use el siguiente comando:
 ```{bash}
 java pacman.MsPacInterface
 ```
-##Notas importantes
+## Notas importantes
+
+> Objetivo: Seguir los siguientes estados:
+> 1- Buscar y Comer PowerPill mas cercana
+> 2- Buscar y Comer Fantasma mas cercano
+> Repetir hasta acabar con PowerPills o morir.
+
+**Nota:** El color de las victimas es -14408449
 
 Se debe procesar la imagen representada por la matríz de enteros int [w][h] dónde w  =?  y h  = ?. 
 
