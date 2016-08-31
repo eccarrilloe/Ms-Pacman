@@ -46,6 +46,7 @@ public class GameState implements Drawable {
         ghostLut.put(MsPacInterface.inky, 1);
         ghostLut.put(MsPacInterface.pinky, 2);
         ghostLut.put(MsPacInterface.sue, 3);
+        ghostLut.put(MsPacInterface.victims,4);
     }
 
     public GameState() {
