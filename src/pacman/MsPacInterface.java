@@ -29,7 +29,7 @@ import stats.StatisticalSummary;
 public class MsPacInterface {
     // delay between each screen capture
     static int delay = 10;
-    static boolean display = false;
+    static boolean display = true;
 
     public static void main(String[] args) throws Exception {
         MsPacInterface ms = new MsPacInterface();
@@ -47,14 +47,14 @@ public class MsPacInterface {
             ms.analyseComponents(pix);
             // System.out.println(pix.length);
             ss.add(t.elapsed());
-            // System.out.println(t);
             int action = ms.ce.gs.agent.move(ms.ce.gs);
+            // System.out.println(t);
             // int action = pa.move(ms.ce.gs);
             pm.move(action);
             tm.log(action, ms.ce.gs);
             if (display) dc.update(action);
             Thread.sleep(delay);
-            // pm.randMove();
+            // pm.randMove();0
         }
         // System.out.println(ss);
     }
@@ -67,8 +67,8 @@ public class MsPacInterface {
         if (display) sd.updateObjects(al);
     }
 
-    static int left = 530;
-    static int top = 274;
+    static int left = 573;
+    static int top = 254;
     public static int width = 223;
     public static int height = 275;
     int[] pixels;

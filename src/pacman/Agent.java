@@ -116,8 +116,8 @@ public class Agent implements Drawable, PacAgent, Constants {
     }
 
     public double eval(Vector2d pos, GameState gs) {
-        if (gs.closestPill != null) {
-            return pos.dist(gs.closestPill);
+        if (gs.closestObjective != null) {
+            return pos.dist(gs.closestObjective);
         } else {
             return 0;
         }

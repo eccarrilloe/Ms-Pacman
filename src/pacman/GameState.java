@@ -4,6 +4,7 @@ import games.math.Vector2d;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.awt.*;
 
 /**
@@ -29,12 +30,14 @@ public class GameState implements Drawable {
     static int strokeWidth = 5;
     static Stroke stroke =  new BasicStroke(strokeWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
     Collection<ConnectedSet> pills;
+    public Collection<ConnectedSet> powerPills;
 
     Collection<ConnectedSet> ghosts;
     Agent agent;
-    Vector2d closestPill;
+    Vector2d closestObjective;
     Vector2d tmp;
-
+    
+    int objectiveState;
     static int nFeatures = 13;
     double[] vec;
 
@@ -46,36 +49,74 @@ public class GameState implements Drawable {
         ghostLut.put(MsPacInterface.inky, 1);
         ghostLut.put(MsPacInterface.pinky, 2);
         ghostLut.put(MsPacInterface.sue, 3);
-        ghostLut.put(MsPacInterface.victims,4);
+        ghostLut.put(MsPacInterface.victims, 4);
     }
 
     public GameState() {
         agent = new Agent();
         tmp = new Vector2d();
         vec = new double[nFeatures];
+        objectiveState = 0;
     }
 
     public void reset() {
-        closestPill = null;
+    	closestObjective = null;
     }
 
     public void update(ConnectedSet cs, int[] pix) {
         if (cs.isPacMan()) {
             agent.update(cs, pix);
-        } else if (cs.ghostLike()) {
-            // update the state of the ghost distance
-
-
-        } else if (cs.pill()) {
-            // keep track of the position of the closest pill
-            tmp.set(cs.x, cs.y);
-            if (closestPill == null) {
-                closestPill = new Vector2d(tmp);
-            } else if (tmp.dist(agent.cur) < closestPill.dist(agent.cur)) {
-                closestPill.set(tmp);
+        } else if (cs.powerPill()) {
+    		ConnectedSet powerPill = new ConnectedSet(cs);
+    		if (powerPills != null && !powerPills.contains(powerPill)) {
+    			powerPills.add(powerPill);
+    		}
+    	} else if (cs.ghostLike()) {
+    		if (cs.fg == MsPacInterface.victims) {
+    			objectiveState = 2;
+    		} else {
+    			objectiveState = 0;
+    		}
+    	}
+        
+        if (objectiveState == 0) {        	
+        	if (powerPills != null && powerPills.size() > 0) {
+                // keep track of the position of the closest powerPill
+        		Iterator<ConnectedSet> it = powerPills.iterator();
+        		while (it.hasNext()) {
+        			ConnectedSet currentPill = it.next();
+        			
+        			tmp.set(currentPill.x, currentPill.y);
+                    if (closestObjective == null) {
+                    	closestObjective = new Vector2d(tmp);
+                    } else if (tmp.dist(agent.cur) < closestObjective.dist(agent.cur)) {
+                    	closestObjective.set(tmp);
+                    }
+        		}
+            }
+        } else if (objectiveState == 1) {
+            if (cs.ghostLike() && cs.fg == MsPacInterface.victims) {
+                // update the state of the ghost distance
+            	tmp.set(cs.x, cs.y);
+                if (closestObjective == null) {
+                	closestObjective = new Vector2d(tmp);
+                } else if (tmp.dist(agent.cur) < closestObjective.dist(agent.cur)) {
+                	closestObjective.set(tmp);
+                }
+            } else {
+            	objectiveState = 0;
+            }
+        } else if (objectiveState == 2) {
+        	if (cs.pill()) {
+                // keep track of the position of the closest powerPill
+                tmp.set(cs.x, cs.y);
+                if (closestObjective == null) {
+                	closestObjective = new Vector2d(tmp);
+                } else if (tmp.dist(agent.cur) < closestObjective.dist(agent.cur)) {
+                	closestObjective.set(tmp);
+                }
             }
         }
-
     }
 
     public void draw(Graphics gg, int w, int h) {
@@ -85,10 +126,10 @@ public class GameState implements Drawable {
         if (agent != null) {
             agent.draw(g, w, h);
         }
-        if (closestPill != null && agent != null) {
+        if (closestObjective != null && agent != null) {
             g.setStroke(stroke);
             g.setColor(Color.cyan);
-            g.drawLine((int) closestPill.x, (int) closestPill.y, (int) agent.cur.x, (int) agent.cur.y);
+            g.drawLine((int) closestObjective.x, (int) closestObjective.y, (int) agent.cur.x, (int) agent.cur.y);
         }
     }
 }

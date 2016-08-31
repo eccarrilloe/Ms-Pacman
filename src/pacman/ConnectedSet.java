@@ -57,7 +57,7 @@ public class ConnectedSet implements Drawable {
                 c == MsPacInterface.pinky ||
                 c == MsPacInterface.inky ||
                 c == MsPacInterface.sue ||
-                 c == MsPacInterface.victims;
+                c == MsPacInterface.victims;
     }
 
     public boolean isPacMan() {
@@ -103,6 +103,10 @@ public class ConnectedSet implements Drawable {
         this.fg = fg;
         c = new Color((fg & 0xFF0000) >> 16, (fg & 0xFF00) >> 8, (fg & 0xFF));
         // System.out.println("Color: " + c + " : " + fg);
+    }
+    
+    public ConnectedSet(ConnectedSet another) {
+    	this(another.x, another.y, another.fg);
     }
 
     public void add(int px, int py, int pos, int val) {
