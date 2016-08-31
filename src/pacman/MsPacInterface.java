@@ -84,6 +84,7 @@ public class MsPacInterface {
     static int pacMan = -256;
     static int edible = -14408449;
     static int pill = -2434305;
+    static int victims = -14408449;
 
     static HashSet<Integer> colors = new HashSet<Integer>();
     static {
@@ -94,6 +95,7 @@ public class MsPacInterface {
         colors.add(pacMan);
         colors.add(edible);
         colors.add(pill);
+        colors.add(victims);
     }
 
     public MsPacInterface() throws Exception {
