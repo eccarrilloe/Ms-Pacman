@@ -34,7 +34,7 @@ public class SimpleExtractor {
         gs = new GameState();
     }
 
-    public ArrayList<Drawable> consume(int[] pix, Set<Integer> colors) {
+    public ArrayList<Drawable> consume(int[] pix, Set<Integer> colors){
         ArrayList<Drawable> objects = new ArrayList<Drawable>();
 
         for (int p = 0; p < pix.length; p++) {
