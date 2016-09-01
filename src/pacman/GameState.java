@@ -8,7 +8,7 @@ import java.awt.Stroke;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.PriorityQueue;
+import java.util.ArrayList;
 
 import games.math.Vector2d;
 
@@ -30,7 +30,7 @@ public class GameState implements Drawable {
 	static int strokeWidth = 5;
 	static Stroke stroke = new BasicStroke(strokeWidth, BasicStroke.CAP_ROUND, BasicStroke.JOIN_MITER);
 	Collection<ConnectedSet> pills;
-	public PriorityQueue<ConnectedSet> powerPills;
+	ArrayList<ConnectedSet> powerPills;
 
 	Collection<ConnectedSet> ghosts;
 	Agent agent;
@@ -38,6 +38,7 @@ public class GameState implements Drawable {
 	Vector2d tmp;
 
 	int objectiveState;
+	int powerPillsEaten;
 	static int nFeatures = 13;
 	double[] vec;
 
@@ -48,15 +49,16 @@ public class GameState implements Drawable {
 		ghostLut.put(MsPacInterface.inky, 1);
 		ghostLut.put(MsPacInterface.pinky, 2);
 		ghostLut.put(MsPacInterface.sue, 3);
-		ghostLut.put(MsPacInterface.victims, 4);
+		ghostLut.put(MsPacInterface.edible, 4);
 	}
 
 	public GameState() {
 		agent = new Agent();
 		tmp = new Vector2d();
 		vec = new double[nFeatures];
+		powerPills =  new ArrayList<>();
 		objectiveState = 0;
-		powerPills =  new PriorityQueue<ConnectedSet>();
+		powerPillsEaten = 0;
 	}
 
 	public void reset() {
@@ -64,76 +66,74 @@ public class GameState implements Drawable {
 	}
 
 	public void update(ConnectedSet cs, int[] pix){
+		System.out.println("PowerPills: " + powerPills.size());
 		if (cs.isPacMan()) {
 			agent.update(cs, pix);
 		} else if (cs.powerPill()) {
 			ConnectedSet powerPill = new ConnectedSet(cs);
-		//	System.out.println("Power Pills 1 " + powerPills);
-			if (powerPills != null && !powerPills.contains(powerPill)) {
+			if (!powerPills.contains(powerPill)) {
 				powerPills.add(powerPill);
-				System.out.println("pill  " +powerPill);
-				System.out.println("Power Pills 2 " + powerPills);
 			}
 		} else if (cs.ghostLike()) {
-		//	System.out.println("Fntasmas azules :D :D :D ");
-			if (cs.fg == MsPacInterface.victims) {
-			//	System.out.println("Fantmas MAS azules");
+			if (cs.edible()) {
 				objectiveState = 1;
 			} else {
-				objectiveState = 0;
+				if (objectiveState == 1) {
+					powerPillsEaten = 4 - powerPills.size();
+					if (powerPillsEaten == 4) {
+						objectiveState = 2;
+					} else {
+						objectiveState = 0;
+					}
+				}
 			}
-		}// 0-> Comer power pill 
+		}
+		
+		System.out.println("Pills eaten = " + powerPillsEaten);
+		
+		// 0-> Comer power pill 
 		// 	1-> Comer fantasma
 		//  2 -> Comer demás pastilas
 		if (objectiveState == 0) {
 			//Estado 0 -> Busca la pastilla
-			//System.out.println("Entro al estado 0");
-			if (powerPills != null && powerPills.size() > 0) {
-				// keep track of the position of the closest powerPill
-				Iterator<ConnectedSet> it = powerPills.iterator();
-				while (it.hasNext()) {
-					ConnectedSet currentPill = it.next();
-					tmp.set(currentPill.x, currentPill.y);
-					if (closestObjective == null) {						
-						closestObjective = new Vector2d(tmp);
-					} else if (tmp.dist(agent.cur) < closestObjective.dist(agent.cur)) {
-						
-						objectiveState = 1;
-						closestObjective.set(tmp);
-						
-					}
+			System.out.println("State #0 - " + powerPills.size());
+			// keep track of the position of the closest powerPill
+			Iterator<ConnectedSet> it = powerPills.iterator();
+			while (it.hasNext()) {
+				ConnectedSet currentPill = it.next();
+				tmp.set(currentPill.x, currentPill.y);
+				if (closestObjective == null) {						
+					closestObjective = new Vector2d(tmp);
+				} else if (tmp.dist(agent.cur) < closestObjective.dist(agent.cur)) {
+					closestObjective.set(tmp);
 				}
-				
+			}
+			
+			if (closestObjective != null && closestObjective.dist(agent.cur) < 2) {
+				ConnectedSet closestSet = new ConnectedSet(closestObjective, MsPacInterface.pill);
+				if (powerPills.contains(closestSet)) {
+					powerPills.remove(closestSet);
+					objectiveState = 1;
+				}
 			}
 		} else if (objectiveState == 1) {
-			//System.out.println("Entro al estado 1");
-			if (cs.fg == MsPacInterface.victims) {
-				// update the state of the ghost distance
-			//	System.out.println("Entro al Estado 1 - -- - - Fantasmas azules");
-				tmp.set(cs.x, cs.y);
+			System.out.println("State #1 - " + powerPills.size());
+			if (cs.edible()) {
 				
+				tmp.set(cs.x, cs.y);
 				if (closestObjective == null) {
 					closestObjective = new Vector2d(tmp);
 				}
-			//	System.out.println("TEEEEEEEEEEEEEEEEEEMP");
+				
 				closestObjective.set(tmp);
-				powerPills.poll();
-				System.out.println("Power Pills 3 " + powerPills);
 							
 				if (tmp.dist(agent.cur) < closestObjective.dist(agent.cur)) {
 					closestObjective.set(tmp);
 				}
-				if (powerPills.isEmpty()){
-					objectiveState = 2;
-				}
-			} else {
-			//	objectiveState = 0;
 			}
 		} else if (objectiveState == 2) {
-			System.out.println("Entro al estado 2");
-			//Busca pildoras normales
+			System.out.println("State #2");
 			if (cs.pill()) {
-				// keep track of the position of the closest powerPill
 				tmp.set(cs.x, cs.y);
 				if (closestObjective == null) {
 					closestObjective = new Vector2d(tmp);

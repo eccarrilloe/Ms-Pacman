@@ -2,6 +2,7 @@ package pacman;
 
 import java.util.ArrayList;
 import java.awt.*;
+import games.math.Vector2d;
 
 public class ConnectedSet implements Drawable {
     // private ArrayList pixels;
@@ -57,7 +58,8 @@ public class ConnectedSet implements Drawable {
                 c == MsPacInterface.pinky ||
                 c == MsPacInterface.inky ||
                 c == MsPacInterface.sue ||
-                c == MsPacInterface.victims;
+                c == MsPacInterface.edible;
+        
     }
 
     public boolean isPacMan() {
@@ -105,6 +107,10 @@ public class ConnectedSet implements Drawable {
         // System.out.println("Color: " + c + " : " + fg);
     }
     
+    public ConnectedSet(Vector2d pos, int fg) {
+    	this((int) pos.x, (int) pos.y, fg);
+    }
+    
     public ConnectedSet(ConnectedSet another) {
     	this(another.x, another.y, another.fg);
     }
@@ -125,7 +131,7 @@ public class ConnectedSet implements Drawable {
 
     public boolean equals(Object obj) {
         ConnectedSet cs = (ConnectedSet) obj;
-        return cs.pTot == pTot;
+        return cs.x == x && cs.y == y;
     }
 
     public String toString() {
