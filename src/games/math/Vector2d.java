@@ -1,5 +1,7 @@
 package games.math;
 
+import pacman.ConnectedSet;
+
 public class Vector2d {
     // of course, also require the methods for adding
     // to these vectors
@@ -138,5 +140,10 @@ public class Vector2d {
     public double dist(Vector2d v) {
         return Math.sqrt(sqDist(v));
     }
+    
+    public int compareTo(Vector2d b) {
+    	return (int) (Math.sqrt(Math.pow(this.x, 2) + Math.pow(this.y, 2)) - Math.sqrt(Math.pow(b.x, 2) + Math.pow(b.y, 2)));
+    }
+    
 
 }

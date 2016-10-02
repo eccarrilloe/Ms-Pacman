@@ -17,7 +17,7 @@ public class Agent implements Drawable, PacAgent, Constants {
     int x, y;
     int w, h;
     Color color;
-
+    
     static int[] dirs = {-width, 1, width, -1};
     static Vector2d[] vDirs = {
             new Vector2d(0, -1),
@@ -79,6 +79,22 @@ public class Agent implements Drawable, PacAgent, Constants {
     }
 
     public int move(GameState gs) {
+    	if (gs.nTest == 3) {
+	    	if (gs.objectiveState == 1 && gs.iterations < 20) {
+	    		gs.iterations += 1;
+	    		return 2;
+	    	} else if(gs.objectiveState == 1 && gs.iterations < 35) {
+	    		gs.iterations += 1;
+	    		return 3;
+	    	} else if(gs.objectiveState == 1 &&  gs.iterations < 40) {
+	    		gs.iterations += 1;
+	    		return 2;
+	    	} else if(gs.objectiveState == 1 &&  gs.iterations == 40) {
+	    		gs.objectiveState = 0;
+	    		gs.iterations = 0;
+	    	}
+    	}
+    	
         // let's say we move towards the
         // simple controller that tries to move towards the nearest power pill
         // set up a rogue value for the move, and a large value for the closest pill
@@ -91,11 +107,14 @@ public class Agent implements Drawable, PacAgent, Constants {
                 tmp.set(cur);
                 // now add in the current direction - this sets the position
                 // to where the agent would be after taking the proposed action for one time step
+                
                 tmp.add(vDirs[i]);
                 // System.out.println(i + "\t " + eval(tmp, gs));
                 // now call eval, and update
                 double curScore = eval(tmp, gs);
+                
                 if (curScore < best) {
+                	
                     move = i;
                     best = curScore;
                 }

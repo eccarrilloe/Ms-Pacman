@@ -37,8 +37,10 @@ public class GameState implements Drawable {
 	Vector2d closestObjective;
 	Vector2d tmp;
 
+	int iterations = 0;
 	int objectiveState;
 	int powerPillsEaten;
+	int nTest;
 	static int nFeatures = 13;
 	double[] vec;
 
@@ -59,6 +61,8 @@ public class GameState implements Drawable {
 		powerPills =  new ArrayList<>();
 		objectiveState = 0;
 		powerPillsEaten = 0;
+		iterations = 0;
+		nTest = 0;
 	}
 
 	public void reset() {
@@ -66,7 +70,6 @@ public class GameState implements Drawable {
 	}
 
 	public void update(ConnectedSet cs, int[] pix){
-		System.out.println("PowerPills: " + powerPills.size());
 		if (cs.isPacMan()) {
 			agent.update(cs, pix);
 		} else if (cs.powerPill()) {
@@ -74,75 +77,36 @@ public class GameState implements Drawable {
 			if (!powerPills.contains(powerPill)) {
 				powerPills.add(powerPill);
 			}
-		} else if (cs.ghostLike()) {
-			if (cs.edible()) {
-				objectiveState = 1;
-			} else {
-				if (objectiveState == 1) {
-					powerPillsEaten = 4 - powerPills.size();
-					if (powerPillsEaten == 4) {
-						objectiveState = 2;
-					} else {
-						objectiveState = 0;
-					}
-				}
-			}
 		}
 		
-		System.out.println("Pills eaten = " + powerPillsEaten);
-		
-		// 0-> Comer power pill 
-		// 	1-> Comer fantasma
-		//  2 -> Comer demás pastilas
-		if (objectiveState == 0) {
-			//Estado 0 -> Busca la pastilla
-			System.out.println("State #0 - " + powerPills.size());
-			// keep track of the position of the closest powerPill
-			Iterator<ConnectedSet> it = powerPills.iterator();
-			while (it.hasNext()) {
-				ConnectedSet currentPill = it.next();
-				tmp.set(currentPill.x, currentPill.y);
+		/**
+		 * Pruebas Realizadas:
+		 * nTest = 1 -> Ir hasta la esquina superior izquierda
+		 * nTest = 2 -> Perseguir a Inky
+		 * nTest = 3 -> Cruzar un tunel repetidamente
+		 */
+		nTest = 3;
+		if (nTest == 1) {				
+			closestObjective = new Vector2d(100.0, 100.0);
+		} else if (nTest == 2) {
+			if (cs.ghostLike() && cs.fg == MsPacInterface.inky) {
+				tmp.set(cs.x, cs.y);
 				if (closestObjective == null) {						
 					closestObjective = new Vector2d(tmp);
 				} else if (tmp.dist(agent.cur) < closestObjective.dist(agent.cur)) {
 					closestObjective.set(tmp);
 				}
 			}
-			
-			if (closestObjective != null && closestObjective.dist(agent.cur) < 2) {
-				ConnectedSet closestSet = new ConnectedSet(closestObjective, MsPacInterface.pill);
-				if (powerPills.contains(closestSet)) {
-					powerPills.remove(closestSet);
+		} else if (nTest == 3) {
+			Vector2d rightTunnel = new Vector2d(200.0, 160.0);
+			if (objectiveState == 0) {
+				closestObjective = rightTunnel;
+				
+				if (Math.abs(agent.cur.x - closestObjective.x) < 5 && Math.abs(agent.cur.y - closestObjective.y) < 5) {
 					objectiveState = 1;
 				}
 			}
-		} else if (objectiveState == 1) {
-			System.out.println("State #1 - " + powerPills.size());
-			if (cs.edible()) {
-				
-				tmp.set(cs.x, cs.y);
-				if (closestObjective == null) {
-					closestObjective = new Vector2d(tmp);
-				}
-				
-				closestObjective.set(tmp);
-							
-				if (tmp.dist(agent.cur) < closestObjective.dist(agent.cur)) {
-					closestObjective.set(tmp);
-				}
-			}
-		} else if (objectiveState == 2) {
-			System.out.println("State #2");
-			if (cs.pill()) {
-				tmp.set(cs.x, cs.y);
-				if (closestObjective == null) {
-					closestObjective = new Vector2d(tmp);
-				} else if (tmp.dist(agent.cur) < closestObjective.dist(agent.cur)) {
-					closestObjective.set(tmp);
-				}
-			}
-		}
-		
+		}	
 	}
 
 	public void draw(Graphics gg, int w, int h) {

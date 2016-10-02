@@ -9,7 +9,7 @@ public class PacMover implements Constants {
     boolean keyPressed;
     int curKey;
     int curDir;
-    // not used when waitForIdle isset to false
+    // not used when waitForIdle is set to false
     static int autoDelay = 20;
     static Random r = new Random();
 

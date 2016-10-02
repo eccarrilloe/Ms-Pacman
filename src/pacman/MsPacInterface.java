@@ -32,29 +32,31 @@ public class MsPacInterface {
     static boolean display = true;
 
     public static void main(String[] args) throws Exception {
-        MsPacInterface ms = new MsPacInterface();
+        
+    	MsPacInterface ms = new MsPacInterface();
         StatisticalSummary ss = new StatisticalSummary();
         PacMover pm = new PacMover();
         DirectionComponent dc = DirectionComponent.easyUse();
-        PacAgent pa = new LeftRight();
+       // PacAgent pa = new LeftRight();
 
         TestMonitor tm = new TestMonitor();
         while(true) {
             ElapsedTimer t = new ElapsedTimer();
 
-            int[] pix = ms.getPixels();
+            int[] pix = ms.getPixels(); // we get all pixels in "pix"
 
             ms.analyseComponents(pix);
             // System.out.println(pix.length);
             ss.add(t.elapsed());
             int action = ms.ce.gs.agent.move(ms.ce.gs);
-            // System.out.println(t);
+         	//MsPacInterface.simpleextractor.gamestate.agent.move
+            
             // int action = pa.move(ms.ce.gs);
             pm.move(action);
             tm.log(action, ms.ce.gs);
             if (display) dc.update(action);
             Thread.sleep(delay);
-            // pm.randMove();0
+            //pm.randMove();
         }
         // System.out.println(ss);
     }
@@ -67,8 +69,8 @@ public class MsPacInterface {
         if (display) sd.updateObjects(al);
     }
 
-    static int left = 573;
-    static int top = 254;
+    static int top = 270;
+    static int left = 570;
     public static int width = 223;
     public static int height = 275;
     int[] pixels;

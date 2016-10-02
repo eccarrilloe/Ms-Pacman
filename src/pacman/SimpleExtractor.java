@@ -35,7 +35,8 @@ public class SimpleExtractor {
     }
 
     public ArrayList<Drawable> consume(int[] pix, Set<Integer> colors){
-        ArrayList<Drawable> objects = new ArrayList<Drawable>();
+        
+    	ArrayList<Drawable> objects = new ArrayList<Drawable>();
 
         for (int p = 0; p < pix.length; p++) {
             if ((pix[p] & 0xFFFFFF) != BG && colors.contains(pix[p])) {
